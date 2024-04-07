@@ -7,12 +7,23 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(D:/SDL2/include)
+include_directories(D:/SDL2_image/include)
 
 link_directories(D:/SDL2/lib/x64)
+link_directories(D:/SDL2_image/lib/x64)
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
+		
+		
+		src/game.h
+		src/pngLoader_SDL2.h
         )
 		
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2.lib SDL2main.lib SDL2test.lib)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/resources 
+	$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources ../build/resources)
+		
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2.lib SDL2main.lib SDL2test.lib SDL2_image.lib)
 		

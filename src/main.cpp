@@ -1,38 +1,50 @@
-#include <iostream>
+#include "game.h"
 
-#include <SDL.h>
-
-const int WIDTH = 800, HEIGHT = 600;
-
-int main(int argc, char* argv[])
+int main(int argc, char** args)
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
+	if (!Game_Init())
+	{
+		printf("Failed to initialize!\n");
+	}
+	else
+	{
 
-    SDL_Window* window = SDL_CreateWindow("MatrixBS2D", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
+	}
+	
+	while (App_Run)
+	{
+		while (SDL_PollEvent(&window_event) != 0) {
+			if (window_event.type == SDL_QUIT) {
+				App_Run = false;
+			}
 
-    // Check that the window was successfully created
-    if (NULL == window)
-    {
-        // In the case that the window could not be made...
-        std::cout << "Could not create window: " << SDL_GetError() << std::endl;
-        return 1;
-    }
+			if (window_event.type == SDL_KEYDOWN) {
+				if (window_event.key.keysym.sym == SDLK_RIGHT) {
+					t_test.Set_PosX(t_test.Get_PosX() + 32);
+				}
+				if (window_event.key.keysym.sym == SDLK_LEFT) {
+					t_test.Set_PosX(t_test.Get_PosX() - 32);
+				}
+				if (window_event.key.keysym.sym == SDLK_UP) {
+					t_test.Set_PosY(t_test.Get_PosY() - 32);
+				}
+				if (window_event.key.keysym.sym == SDLK_DOWN) {
+					t_test.Set_PosY(t_test.Get_PosY() + 32);
+				}
+			}
+		}
 
-    SDL_Event windowEvent;
+		Game_Step();
 
-    while (true)
-    {
-        if (SDL_PollEvent(&windowEvent))
-        {
-            if (SDL_QUIT == windowEvent.type)
-            {
-                break;
-            }
-        }
-    }
+		Game_Draw();
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+	}
 
-    return EXIT_SUCCESS;
+	
+
+	//SDL_Delay(2000);
+
+	Game_Exit();//Завершение программы
+	return 0;
 }
+
