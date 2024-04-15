@@ -8,7 +8,7 @@ int main(int argc, char** args)
 	}
 	else
 	{
-
+		Game_LoadMedia();
 	}
 	
 	while (App_Run)
@@ -18,26 +18,40 @@ int main(int argc, char** args)
 				App_Run = false;
 			}
 
+
 			if (window_event.type == SDL_KEYDOWN) {
 				if (window_event.key.keysym.sym == SDLK_RIGHT) {
-					t_test.Set_PosX(t_test.Get_PosX() + 32);
+					player.MovePosition(player.speed, 0);
 				}
+
 				if (window_event.key.keysym.sym == SDLK_LEFT) {
-					t_test.Set_PosX(t_test.Get_PosX() - 32);
+					player.MovePosition(-player.speed, 0);
 				}
+
 				if (window_event.key.keysym.sym == SDLK_UP) {
-					t_test.Set_PosY(t_test.Get_PosY() - 32);
+					player.MovePosition(0, -player.speed);
 				}
+
 				if (window_event.key.keysym.sym == SDLK_DOWN) {
-					t_test.Set_PosY(t_test.Get_PosY() + 32);
+					player.MovePosition(0, player.speed);
 				}
+
+				if (window_event.key.keysym.sym == SDLK_p) {
+					system("cls");
+					std::cout << "posPLx: " << player.GetPosition().x << std::endl;
+					std::cout << "posPLy: " << player.GetPosition().y << std::endl;
+					std::cout << "posCamx: " << camera.x << std::endl;
+					std::cout << "posCamy: " << camera.y << std::endl;
+					std::cout << "dist: " << player.GetDist(camera.x, camera.y) << std::endl;
+					
+				}
+				
 			}
 		}
 
 		Game_Step();
 
 		Game_Draw();
-
 	}
 
 	
