@@ -9,6 +9,7 @@ const int SCREEN_HEIGHT = 480;//высота окна
 //The camera area
 SDL_Rect camera = { 0, 0, SCREEN_WIDTH / 2 - 64, SCREEN_HEIGHT / 2 - 64 };
 
+
 void Camera_step(int x, int y)
 {
 	camera.x = -x;

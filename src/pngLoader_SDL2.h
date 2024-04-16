@@ -21,7 +21,9 @@ private:
     SDL_Texture* t_texture = NULL;
     SDL_Renderer* r_ren = NULL;
     SDL_Rect rect_texture;
+    SDL_Rect start_rect;
     SDL_Rect pos_texture;
+    
     SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL; //начальная позиция
 
 public:
@@ -32,6 +34,7 @@ public:
 
 	PngTexture(std::string path_to_file, float X, float Y, float W, float H, SDL_Renderer* ren)
 	{
+        
         r_ren = ren;
         rect_texture.x = X;
         rect_texture.y = Y;
@@ -54,7 +57,9 @@ public:
         if (t_texture == NULL) {
             std::cout << "Can't create texture from surface: " << SDL_GetError() << std::endl;
         }
-
+        start_rect.x = 0;
+        start_rect.x = 0;
+        SDL_QueryTexture(t_texture, NULL, NULL, &start_rect.w, &start_rect.h);
 	}
 
     void t_Draw()
@@ -73,15 +78,19 @@ public:
 
     }
 
-    void Set_TextureRect(float x, float y)
+    void Set_TextureRect(SDL_Rect rect)
     {
-        rect_texture.x = x;
-        rect_texture.y = y;
+        rect_texture = rect;
     }
 
     SDL_Rect GetRect()
     {
         return rect_texture;
+    }
+
+    SDL_Rect GetStartRect()
+    {
+        return start_rect;
     }
 
 

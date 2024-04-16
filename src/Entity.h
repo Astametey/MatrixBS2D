@@ -29,6 +29,11 @@ public:
 		t_texture.t_Draw();
 	}
 
+	PngTexture GetTexture()
+	{
+		return t_texture;
+	}
+
 	void E_Update()
 	{
 		t_texture.t_Update();

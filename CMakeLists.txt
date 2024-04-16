@@ -17,12 +17,22 @@ link_directories(D:/SDL2_ttf/lib/x64)
 add_executable(${PROJECT_NAME}
         src/main.cpp
 		
-		
 		src/game.h
+		
+		src/level.h
 		src/pngLoader_SDL2.h
 		src/camera.h
 		src/Entity.h
 		
+		src/tinyxml/tinystr.cpp
+		src/tinyxml/tinyxml.cpp
+		src/tinyxml/tinyxml2.cpp
+		src/tinyxml/tinyxmlerror.cpp
+		src/tinyxml/tinyxmlparser.cpp
+		
+		src/tinyxml/tinyxml.h
+		src/tinyxml/tinyxml2.h
+		src/tinyxml/tinystr.h
         )
 		
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

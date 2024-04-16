@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Entity.h"
-#include "camera.h"
+#include "level.h"
 
 //Инициализация глобальных ресурсов
 
@@ -12,13 +12,10 @@ SDL_Surface* screen_surface = NULL;//Поверхность окна для рисования
 SDL_Surface* View_surface = NULL;//view surface
 SDL_Renderer* Main_render = NULL;//главный рендер
 
-
+Level level_test;
 
 SDL_Event window_event;//События окна
 PngTexture t_player;
-PngTexture t_test2;
-
-Entity player;
 
 TTFLoad_SDL2 gTextTexture;
 
@@ -85,9 +82,8 @@ void Game_LoadMedia()
     player = Entity(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, t_player);
     player.SetPosition(0, 0);
 
-    t_test2 = PngTexture("resources/Off.png", 0, 0, 32, 32, Main_render);
-    t_test2.SetPosition(0, 0);
-
+    //load level file
+    level_test.LoadFromFile("resources/test.tmx", "resources/Off.png", Main_render);
    
         //load text
     gFont = TTF_OpenFont("resources/Times_New_Roman.ttf", 24);
@@ -111,32 +107,9 @@ void Game_Draw()
     SDL_RenderClear(Main_render);//Очистка рендера
     
     /// Рисование уровня
-    for (int i = 0; i < (LEVEL_WIDTH / 32) + 3 ; i++)
-    {
-        for (int j = 0; j < (LEVEL_HEIGHT / 32) + 3; j++)
-        {
+    level_test.Draw();
 
-            if (i == 0 || i == (LEVEL_WIDTH / 32) + 2 || j == 0 || j == (LEVEL_HEIGHT / 32) + 2)
-            {
-                t_test2.Set_TextureRect(64, 0);
-            }
-            else
-            {
-                t_test2.Set_TextureRect(0, 0);
-            }
-
-            t_test2.SetPosition((i * 32 + (SCREEN_WIDTH / 2)), (j * 32 + (SCREEN_HEIGHT / 2)), camera);
-            if ((i * 32) > player.GetPosition().x - camera.w && (i * 32) < player.GetPosition().x + camera.w &&
-                (j * 32) > player.GetPosition().y - camera.h && (j * 32) < player.GetPosition().y + camera.h)
-            {
-               t_test2.t_Draw();
-            }
-                
-            
-            
-        }
-    }
-
+    
     player.E_Draw();//Игрок
     gTextTexture.t_Draw();//Текst
 
@@ -146,11 +119,12 @@ void Game_Draw()
 
 void Game_Exit()
 {
-    t_test2.Free();
     t_player.Free();
     gTextTexture.Free();
 
     player.E_free();
+
+    level_test.L_Free();
 
     TTF_CloseFont(gFont);
     gFont = NULL;
