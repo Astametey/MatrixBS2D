@@ -3,9 +3,10 @@
 #include "Entity.h"
 #include "level.h"
 
+
 //Инициализация глобальных ресурсов
 
-bool App_Run = true;//Работа приложения
+
 
 SDL_Window* window = NULL;//Окно приложения
 SDL_Surface* screen_surface = NULL;//Поверхность окна для рисования
@@ -14,11 +15,9 @@ SDL_Renderer* Main_render = NULL;//главный рендер
 
 Level level_test;
 
-SDL_Event window_event;//События окна
 PngTexture t_player;
 
 TTFLoad_SDL2 gTextTexture;
-
 
 bool Game_Init()
 {
@@ -80,22 +79,27 @@ void Game_LoadMedia()
 {
     t_player = PngTexture("resources/Entities/little_demon_col.png", 0, 0, 12, 20, Main_render);
     player = Entity(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, t_player);
-    player.SetPosition(0, 0);
+    
 
     //load level file
-    level_test.LoadFromFile("resources/test.tmx", "resources/Off.png", Main_render);
-   
+    level_test.LoadFromFile("resources/testmap.tmx", "resources/tile set.png", Main_render);
+    //player.SetPosition(level_test.GetObject("obj_player").rect.x, level_test.GetObject("obj_player").rect.y);
+
         //load text
     gFont = TTF_OpenFont("resources/Times_New_Roman.ttf", 24);
     gTextTexture = TTFLoad_SDL2("Player", 32, 100, Main_render);
         
+   
 }
 
 void Game_Step()
 {
-
     Camera_step(player.GetPosition().x, player.GetPosition().y);
     player.E_Update();
+   
+    player.MovePosition(player.speedx, player.speedy);
+    //player.checkCollision(level_test.GetObject("solid").rect);
+    
 
 
     gTextTexture.SetPosition(SCREEN_WIDTH / 2 - 6, SCREEN_HEIGHT / 2 - 22);

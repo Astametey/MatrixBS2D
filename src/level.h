@@ -5,6 +5,7 @@
 #include <map>
 #include <SDL.h>
 #include <iostream>
+#include <sstream>
 #include "tinyxml/tinyxml.h"
 #include "camera.h"
 
@@ -22,6 +23,7 @@ struct Object
 struct Layer//слои
 {
 	int opacity;//непрозрачность слоя
+	std::vector<int> tileGID;
 };
 
 
@@ -36,7 +38,6 @@ public:
 	std::vector<Object> GetAllObjects();//выдаем все объекты в наш уровень
 	std::vector<SDL_Rect> num_tile;
 	SDL_Rect GetTileSize;//получаем размер тайла
-	int** tileGID = { new int* [width] };//Vector tile gid // выделяем память под двухмерный массив
 	
 	void Draw();
 	Level();
@@ -88,19 +89,12 @@ bool Level::LoadFromFile(std::string filename, std::string tileset_path, SDL_Ren
 	tilesetElement = map->FirstChildElement("tileset");
 	firstTileID = atoi(tilesetElement->Attribute("firstgid"));
 
-	for (unsigned i{}; i < width; i++)
-	{
-		tileGID[i] = new int[height] {};
-	}
-
-	
-
 	// source - путь до картинки в контейнере image
 	//TiXmlElement* image;
 	//image = tilesetElement->FirstChildElement("image");
 	//std::string imagepath = image->Attribute("source");
 	// пытаемся загрузить тайлсет
-	
+
 	tileMap_texture = PngTexture(tileset_path.c_str(), 0, 0, tileWidth, tileHeight, r_ren);
 
 	// получаем количество столбцов и строк тайлсета
@@ -109,114 +103,82 @@ bool Level::LoadFromFile(std::string filename, std::string tileset_path, SDL_Ren
 	std::cout << "columns = " << columns << std::endl;
 	std::cout << "rows = " << rows << std::endl;
 
-	// вектор из прямоугольников изображений (TextureRect)
+	
+	//Загрузка номеров тайлов в вектор из прямоугольников изображений (TextureRect)
+
 	GetTileSize.w = tileWidth;
 	GetTileSize.h = tileHeight;
-	for (int i = 0; i < columns; i++)
+
+	for (int i = 0; i < rows; i++)
 	{
-		for (int j = 0; j < rows; j++)
+		for (int j = 0; j < columns; j++)
 		{
 			SDL_Rect rect;
-			rect.x = i * tileWidth;
-			rect.y = j * tileHeight;
+			rect.x = j * tileWidth;
+			rect.y = i * tileHeight;
 			rect.w = tileWidth;
 			rect.h = tileHeight;
 			num_tile.push_back(rect);
-			
+
 		}
-		
+
 	}
 
-	//Загрузка номеров тайлов
-	
+
 	// работа со слоями
-	/*
+
+	// Получить все элементы слоя ("layer")
 	
-	while (layerElement)
+	std::vector<TiXmlElement*> layerElements;
+	for (TiXmlElement* layerElement = map->FirstChildElement("layer"); layerElement != nullptr; layerElement = layerElement->NextSiblingElement("layer"))
+	{
+		layerElements.push_back(layerElement);
+	}
+	// Для каждого слоя
+	for (auto layerElement : layerElements)
 	{
 		Layer layer;
-		// если присутствует opacity, то задаем прозрачность слоя, иначе он полностью непрозрачен
-		if (layerElement->Attribute("opacity") != NULL)
+		
+		
+		// Получить данные слоя (значения тайлов)
+		TiXmlElement* dataElement = layerElement->FirstChildElement("data");
+		const char* data = dataElement->GetText();
+		
+		// Разбить данные на отдельные значения тайлов
+		
+		int buffer_0 = 0;
+		
+		std::vector<int> tileGIDs;
+		std::stringstream ss(data);
+		int tileGID = 0;
+		char delimiter;
+		while (ss >> tileGID)
 		{
-			float opacity = strtod(layerElement->Attribute("opacity"), NULL);
-			layer.opacity = 255 * opacity;
+			ss >> delimiter; // Пропустить запятую
+			tileGIDs.push_back(tileGID);
+			layer.tileGID.push_back(tileGID);
 		}
-		else
+		
+		
+		
+		std::cout << "Number of layer:" << layers.size() << std::endl;
+
+		std::cout << "layer name: " << layerElement->Attribute("name") << std::endl;
+		// Вывести значения тайлов
+		for (int i = 0; i < layer.tileGID.size(); i++)
 		{
-			layer.opacity = 255;
-		}
-		//  контейнер <data> 
-		
-		//  контейнер <tile> - описание тайлов каждого слоя
-		
-		int x = 0;
-		int y = 0;
-		
-		while (tileElement)
-		{
-			int tileGID = atoi(tileElement->Attribute("gid"));
-			int subRectToUse = tileGID - firstTileID;
-			// Устанавливаем TextureRect каждого тайла
-			tileElement = tileElement->NextSiblingElement("tile");
-			x++;
-			if (x >= width)
+			std::cout << layer.tileGID[i] << " ";
+			if ((i + 1) % height == 0)
 			{
-				x = 0;
-				y++;
-				if (y >= height)
-					y = 0;
+				std::cout << std::endl;
 			}
 		}
+
 		layers.push_back(layer);
-		layerElement = layerElement->NextSiblingElement("layer");
-	}
-	
-	// работа с объектами
-	TiXmlElement* objectGroupElement;
-	// если есть слои объектов
-	if (map->FirstChildElement("objectgroup") != NULL)
-	{
-		objectGroupElement = map->FirstChildElement("objectgroup");
-		
-	}
-	else
-	{
-		std::cout << "No object layers found..." << std::endl;
-	}
-	return true;
-	*/
-
-	TiXmlElement* layerElement;
-	layerElement = map->FirstChildElement("layer");
-
-	TiXmlElement* layerDataElement;
-	layerDataElement = layerElement->FirstChildElement("data");
-	if (layerDataElement == NULL)
-	{
-		std::cout << "Bad map. No layer information found." << std::endl;
-	}
-
-	TiXmlElement* tileElement;
-	tileElement = layerDataElement->FirstChildElement("tile");
-	if (tileElement == NULL)
-	{
-		std::cout << "Bad map. No tile information found." << std::endl;
-		return false;
-	}
-	
-	for (int i = 0; i < width; i++)
-	{
-		for (int j = 0; j < height; j++)
-		{
-			int element = atoi(tileElement->Attribute("gid"));
-			
-			tileElement = tileElement->NextSiblingElement("tile");
-			tileGID[i][j] = element - 1;
-			std::cout << tileGID[i][j];
-		}
 		std::cout << std::endl;
-	};
-	
+	}
+
+
 }
 
 /*
@@ -243,33 +205,49 @@ std::vector<Object> Level::GetAllObjects()
 */
 Level::Level()
 {
-	
+
 };
+
 
 void Level::Draw()
 {
 	// рисуем все тайлы (объекты не рисуем!)
-	/// Рисование уровня
 	
-	for (int i = 0; i < (width); i++)
+	
+	for (int l = 0; l < layers.size(); l++)
 	{
-		for (int j = 0; j < (height); j++)
+		int h = 0;
+		int w = 0;
+		for (int i = 0; i < (layers[l].tileGID.size()); i++)
 		{
-			
-			
-			GetTileSize = num_tile[tileGID[i][j]];
-			tileMap_texture.Set_TextureRect(GetTileSize);
-			
 
-
-			tileMap_texture.SetPosition((j * tileHeight) + SCREEN_WIDTH / 2,  (i * tileWidth) + SCREEN_HEIGHT / 2, camera);
-			if ((j * 32) > player.GetPosition().x - camera.w && (j * 32) < player.GetPosition().x + camera.w &&
-				(i * 32) > player.GetPosition().y - camera.h && (i * 32) < player.GetPosition().y + camera.h)
+			if (layers[l].tileGID[i] != 0)
 			{
-			tileMap_texture.t_Draw();
+				GetTileSize = num_tile[layers[l].tileGID[i] - 1];
+				tileMap_texture.Set_TextureRect(GetTileSize);
+
+				tileMap_texture.SetPosition((w * tileWidth) + SCREEN_WIDTH / 2, (h * tileHeight) + SCREEN_HEIGHT / 2, camera);
+				tileMap_texture.t_Draw();
+			};
+			w++;
+			if ((i + 1) % height == 0)
+			{
+				w = 0;
+				h++;
 			}
 		}
 	};
+
+	
+	/// Рисование уровня
+	/*
+	GetTileSize = num_tile[layers[0].tileGID[71] - 1];
+
+	tileMap_texture.Set_TextureRect(GetTileSize);
+
+	tileMap_texture.SetPosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, camera);
+	tileMap_texture.t_Draw();
+	*/
 }
 
 
@@ -277,11 +255,8 @@ void Level::L_Free()
 {
 	tileMap_texture.Free();
 	// удаление массивов    
-	for (unsigned i{}; i < width; i++)
-	{
-		delete[] tileGID[i];
-	}
-	delete[] tileGID;
-		
+	
+
+
 }
 #endif

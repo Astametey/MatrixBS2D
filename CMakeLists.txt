@@ -23,6 +23,7 @@ add_executable(${PROJECT_NAME}
 		src/pngLoader_SDL2.h
 		src/camera.h
 		src/Entity.h
+		src/events.h
 		
 		src/tinyxml/tinystr.cpp
 		src/tinyxml/tinyxml.cpp

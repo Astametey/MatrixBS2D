@@ -10,12 +10,21 @@ private:
 	PngTexture t_texture;
 
 public:
-	float speed = 4;
+	float speedx = 0, speedy = 0;
 
 	Entity()
 	{
 
 	};
+
+	//void checkCollision(SDL_Rect obj_rect)
+	//{
+	//	
+	//	if (pos_entity.x < obj_rect.x + obj_rect.w && pos_entity.y > obj_rect.y - 1 && pos_entity.y < obj_rect.y + obj_rect.h)
+	//	{
+	//		pos_entity.x -= speedx;
+	//	};
+	//}
 
 	Entity(float X, float Y, PngTexture texture)
 	{

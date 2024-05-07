@@ -1,3 +1,6 @@
+#ifndef PNGLOADER_SDL2_H
+#define PNGLOADER_SDL2_H
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -248,6 +251,4 @@ public:
 
 
 
-
-
-
+#endif
